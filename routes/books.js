@@ -30,8 +30,22 @@ routes.post("/books", async (req, res) => {
 })
 
 //Update existing Book By Id
-routes.post("/book/:bookid", (req, res) => {
-    res.send({message: "Update existing Book By Id"})
+routes.put("/book/:bookid", async (req, res) => {
+    try {
+        const updatedBook = await BookModel.findByIdAndUpdate(
+            req.params.bookid,
+            req.body,
+            { new: true }
+        );
+
+        if (!updatedBook) {
+            return res.status(404).send({ message: "Book Not Found" });
+        }
+
+        res.status(200).send(updatedBook);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 })
 
 //Delete Book By ID
@@ -52,13 +66,29 @@ routes.delete("/book/:bookid", async (req, res) => {
 })
 
 //Get Book By ID
-routes.get("/book/:bookid", (req, res) => {
-    res.send({message: "Get Book By ID"})
+routes.get("/book/:bookid", async (req, res) => {
+    try {
+        const book = await BookModel.findById(req.params.bookid);
+
+        if (!book) {
+            return res.status(404).send({ message: "Book Not Found" });
+        }
+
+        res.status(200).send(book);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 })
 
 //Get All Books in sorted order
-routes.get("/books/sort", (req, res) => {
-    res.send({message: "Get All Books in sorted order"})
+routes.get("/books/sort", async (req, res) => {
+    try {
+        const bookList = await BookModel.find({}).sort({ title: 1 }); // You can change the sorting criteria as needed.
+
+        res.status(200).send(bookList);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 })
 
 module.exports = routes
