@@ -1,14 +1,21 @@
-const express = require("express")
-const BookModel = require('../models/Books')
-const routes = express.Router()
+const express = require("express");
+const BookModel = require('../models/Books');
+const routes = express.Router();
 
-// Get All Books
+// Get All Books with optional sorting by title
 routes.get("/books", async (req, res) => {
     try {
-        const bookList = await BookModel.find({})
-        res.status(200).send(bookList)
+        let bookList;
+
+        if (req.query.sortBy === "title") {
+            bookList = await BookModel.find({}).sort({ title: 1 });
+        } else {
+            bookList = await BookModel.find({});
+        }
+
+        res.status(200).send(bookList);
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error);
     }
 });
 
@@ -18,10 +25,10 @@ routes.post("/books", async (req, res) => {
         const newBook = new BookModel({
             ...req.body
         });
-        await newBook.save()
-        res.status(201).send(newBook)
+        await newBook.save();
+        res.status(201).send(newBook);
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error);
     }
 });
 
@@ -35,41 +42,41 @@ routes.put("/books/:_id", async (req, res) => {
         );
 
         if (!updatedBook) {
-            return res.status(404).send({ message: "Book Not Found" })
+            return res.status(404).send({ message: "Book Not Found" });
         }
 
-        res.status(200).send(updatedBook)
+        res.status(200).send(updatedBook);
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error);
     }
 });
 
 // Delete Book By ID
 routes.delete("/books/:_id", async (req, res) => {
     try {
-        const book = await BookModel.findOneAndDelete({ _id: req.params._id })
+        const book = await BookModel.findOneAndDelete({ _id: req.params._id });
         if (!book) {
-            res.status(404).send({ message: "Book Not Found" })
+            res.status(404).send({ message: "Book Not Found" });
         } else {
             res.status(204).send(book);
         }
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error);
     }
 });
 
 // Get Book By ID
 routes.get("/books/:_id", async (req, res) => {
     try {
-        const book = await BookModel.findById(req.params._id)
+        const book = await BookModel.findById(req.params._id);
 
         if (!book) {
-            return res.status(404).send({ message: "Book Not Found" })
+            return res.status(404).send({ message: "Book Not Found" });
         }
-        res.status(200).send(book)
+        res.status(200).send(book);
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error);
     }
 });
 
-module.exports = routes
+module.exports = routes;
